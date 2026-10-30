@@ -1,0 +1,5 @@
+calculator-app/
+├── main.py
+├── requirements.txt
+├── Dockerfile
+└── .gitignore
