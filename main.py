@@ -1,11 +1,47 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import HTMLResponse
 import uvicorn
 
 app = FastAPI(title="Calculator API")
 
-@app.get("/")
+@app.get("/", response_class=HTMLResponse)
 def read_root():
-    return {"message": "Calculator is running. Navigate to /docs to use the UI."}
+    return """
+    <html>
+        <head>
+            <title>Web Calculator</title>
+            <style>
+                body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+                input, button { padding: 10px; margin: 5px; font-size: 16px; }
+            </style>
+        </head>
+        <body>
+            <h1>Simple Calculator</h1>
+            <input type="number" id="num1" placeholder="Number 1">
+            <input type="number" id="num2" placeholder="Number 2">
+            <br>
+            <button onclick="calculate('add')">Add</button>
+            <button onclick="calculate('subtract')">Subtract</button>
+            <button onclick="calculate('divide')">Divide</button>
+            <h2 id="result">Result: </h2>
+            
+            <script>
+                async function calculate(operation) {
+                    const a = document.getElementById('num1').value;
+                    const b = document.getElementById('num2').value;
+                    const response = await fetch(`/${operation}?a=${a}&b=${b}`);
+                    const data = await response.json();
+                    
+                    if (response.ok) {
+                        document.getElementById('result').innerText = 'Result: ' + data.result;
+                    } else {
+                        document.getElementById('result').innerText = 'Error: ' + data.detail;
+                    }
+                }
+            </script>
+        </body>
+    </html>
+    """
 
 @app.get("/add")
 def add(a: float, b: float):
